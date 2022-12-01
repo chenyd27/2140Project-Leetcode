@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--User 配置文件-->
+<!--namespace = 绑定一个对应的mapper / dao 接口
+    实现接口
+-->
+<mapper namespace="com.leetcode.mapper.QuestionMapper">
+    <!--动态sql-->
+    <resultMap id="questionMap" type="Question">
+        <id column="id" property="id"/>
+        <id column="name" property="name"/>
+        <id column="url" property="url"/>
+        <id column="difficulty" property="difficulty"/>
+        <collection property="solutionList" ofType="Solution">
+            <id column="sid" property="id"/>
+            <result column="title" property="title"/>
+            <result column="content" property="content"/>
+            <result column="author" property="author"/>
+            <result column="surl" property="url"/>
+        </collection>
+    </resultMap>
+    <select id="getAllQuestion" resultMap="questionMap">
+        select q.*,s.title,s.content,s.author,s.url as surl,s.id as sid from question q, solution s
+        <if test="name != null">
+            where (s.content like #{name} or s.title like #{name} or q.name like #{name}) and q.id = s.qid
+        </if>
+        <if test="name == null">
+            where q.id = s.qid
+        </if>
+    </select>
+    <select id="getQuestionCounts" resultType="Integer">
+        select count(*) from question
+        <if test="name != null">
+            where name like #{name}
+        </if>
+    </select>
+</mapper>
