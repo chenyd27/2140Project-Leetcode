@@ -35,7 +35,7 @@ public class LeetcodeService {
         BulkRequest bulkRequest = new BulkRequest();
         bulkRequest.timeout("10m");
         for(Discuss discuss : discusses){
-            bulkRequest.add(new IndexRequest("leetcode_search")
+            bulkRequest.add(new IndexRequest("leetcode_search_plus")
                     .source(JSON.toJSONString(discuss),XContentType.JSON));
         }
         BulkResponse bulkResponse = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);

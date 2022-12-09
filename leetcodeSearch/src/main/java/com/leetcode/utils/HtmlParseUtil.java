@@ -79,7 +79,10 @@ public class HtmlParseUtil {
            WebDriver driver = new ChromeDriver();
            driver.get(url);
            WebElement page = driver.findElement(By.tagName("body"));
+           // 优化这个
            String content = page.getText();
+
+           System.out.println(content);
            driver.quit();
            discuss.setContent(content);
            discusses.add(discuss);
