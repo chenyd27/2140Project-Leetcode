@@ -78,6 +78,7 @@ public class HtmlParseUtil {
            System.setProperty("webdriver.chrome.driver","chromedriver");
            WebDriver driver = new ChromeDriver();
            driver.get(url);
+           Thread.sleep(2000);
            WebElement page = driver.findElement(By.tagName("body"));
            // 优化这个
            String content = page.getText();
