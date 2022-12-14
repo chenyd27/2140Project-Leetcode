@@ -21,9 +21,7 @@ import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -52,17 +50,56 @@ public class LeetcodeService {
         // 匹配
         MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("content",keywords);
         MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
-        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery("content","*" + keywords + "*");
+        HashMap<String,Map<String,Object>> tmp = new HashMap<>();
+        List<Map<String,Object>> ans = new ArrayList<>();
+        sourceBuilder.from(pageNo);
+        sourceBuilder.size(pageSize);
         if(keywords != ""){
-            sourceBuilder.query(matchQueryBuilder);
+            String[] terms = keywords.split(" ");
+            for(String term : terms){
+                MatchQueryBuilder matchQuery = QueryBuilders.matchQuery("content",term);
+                sourceBuilder.query(matchQuery);
+                searchRequest.source(sourceBuilder);
+                SearchResponse resp = restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
+                for(SearchHit documentFields : resp.getHits().getHits()){
+                    Map<String,Object> map1 = tmp.getOrDefault(documentFields.getId(),documentFields.getSourceAsMap());
+                    map1.put(term,(double)documentFields.getScore());
+                    tmp.put(documentFields.getId(),map1);
+                }
+            }
+            for(Map<String,Object> objectMap : tmp.values()){
+                double score = 1.0;
+                for(String term : terms){
+                    score *= (double) objectMap.getOrDefault(term,0.01);
+                }
+                objectMap.put("score",score);
+                ans.add(objectMap);
+            }
+            Collections.sort(ans,(s1,s2)->{
+                return (double)s1.get("score") - (double) s2.get("score") >= 0 ? -1 : 1;
+            });
+            // sourceBuilder.query(matchQueryBuilder);
         }else{
             sourceBuilder.query(matchAllQueryBuilder);
+            sourceBuilder.from(pageNo);
+            sourceBuilder.size(pageSize);
+            // 执行搜索
+            searchRequest.source(sourceBuilder);
+            SearchResponse response = restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
+            for(SearchHit documentFields : response.getHits().getHits()){
+                Map<String,Object> map = documentFields.getSourceAsMap();
+                map.put("score",documentFields.getScore());
+                ans.add(map);
+            }
             //sourceBuilder.sort(new FieldSortBuilder("id").order(SortOrder.ASC));
         }
         sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+        /**
+         *
         // 分页
         sourceBuilder.from(pageNo);
         sourceBuilder.size(pageSize);
+
         // 执行搜索
         searchRequest.source(sourceBuilder);
         SearchResponse response = restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
@@ -73,7 +110,9 @@ public class LeetcodeService {
             map.put("score",documentFields.getScore());
             list.add(map);
         }
-        return list;
+         */
+        System.out.println(ans.size());
+        return ans;
     }
     // 获取数据，实现搜索功能
     public int getPage(String keywords) throws Exception{

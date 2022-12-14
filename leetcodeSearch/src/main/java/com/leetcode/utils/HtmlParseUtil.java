@@ -50,6 +50,11 @@ public class HtmlParseUtil {
                 index += 2;
                 String difficuly = split[index];
                 String id = topic[0];
+                if(id.length() < 4){
+                    if(id.length() == 1) id = "000" + id;
+                    else if(id.length() == 2) id = "00" + id;
+                    else if(id.length() == 3) id = "0" + id;
+                }
                 String title = topic[1];
                 String tmp = title.replace(' ','-');
                 index++;
