@@ -16,10 +16,9 @@ import java.util.Map;
 public class QuestionController {
     @Autowired
     QuestionMapper questionMapper;
-    // 将分页和模糊查询的参数封装到实体中
+    // Wrapping parameters for paging and fuzzy queries into entities
     @RequestMapping("/allquestion")
     public Map<String,Object> getUserList(QueryInfo queryInfo){
-        // 模糊查询 —— 前后加%
         int count = questionMapper.getQuestionCounts("%" + queryInfo.getQuery() + "%");
         int pageStart = (queryInfo.getPageNum() - 1) * queryInfo.getPageSize();
         List<Question> questionList = questionMapper.getAllQuestion("%" + queryInfo.getQuery() + "%",pageStart, queryInfo.getPageSize());

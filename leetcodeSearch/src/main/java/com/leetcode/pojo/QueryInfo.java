@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QueryInfo {
-    private String query; // 查询信息
-    private int pageNum = 1; // 当前页书
-    private int pageSize = 1; // 每页最大数
+    private String query; // Inquiry Information
+    private int pageNum = 1; // Current Page
+    private int pageSize = 1; // Maximum number per page
 }

@@ -39,15 +39,14 @@ public class LeetcodeService {
         BulkResponse bulkResponse = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
         return !bulkResponse.hasFailures();
     }
-    // 获取数据，实现搜索功能
     public List<Map<String,Object>> searchPage(String keywords, int pageNo, int pageSize) throws Exception{
         if(pageNo <= 1){
             pageNo = 0;
         }
-        // 条件搜索
+        // Condition Search
         SearchRequest searchRequest = new SearchRequest("leetcode_search");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        // 匹配
+        // Matching
         MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("content",keywords);
         MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
         HashMap<String,Map<String,Object>> tmp = new HashMap<>();
@@ -94,32 +93,15 @@ public class LeetcodeService {
             //sourceBuilder.sort(new FieldSortBuilder("id").order(SortOrder.ASC));
         }
         sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
-        /**
-         *
-        // 分页
-        sourceBuilder.from(pageNo);
-        sourceBuilder.size(pageSize);
-
-        // 执行搜索
-        searchRequest.source(sourceBuilder);
-        SearchResponse response = restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
-        // 解析结果
-        ArrayList<Map<String,Object>> list = new ArrayList<>();
-        for(SearchHit documentFields : response.getHits().getHits()){
-            Map<String,Object> map = documentFields.getSourceAsMap();
-            map.put("score",documentFields.getScore());
-            list.add(map);
-        }
-         */
         System.out.println(ans.size());
         return ans;
     }
-    // 获取数据，实现搜索功能
+    // Get data and implement search function
     public int getPage(String keywords) throws Exception{
-        // 条件搜索
+        // Condition Search
         SearchRequest searchRequest = new SearchRequest("leetcode_search");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        // 匹配
+        // Matching
         MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("content",keywords);
         MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
         WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery("content","*" + keywords + "*");
@@ -132,11 +114,11 @@ public class LeetcodeService {
         sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
         sourceBuilder.from(0);
         sourceBuilder.size(2450);
-        // 执行搜索
+        // execute a search
         searchRequest.source(sourceBuilder);
         SearchResponse response = restHighLevelClient.search(searchRequest,RequestOptions.DEFAULT);
         System.out.println(response.getHits().getHits().length);
-        // 解析结果
+        // Parsing results
         return response.getHits().getHits().length;
     }
 }
